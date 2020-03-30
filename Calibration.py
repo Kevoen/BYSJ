@@ -43,7 +43,9 @@ def calib_n(inter_corner_shape, img_dir, img_type):
             # Draw and display the corners
             cv.drawChessboardCorners(img, (w, h), corners2, ret)
             cv.imshow('img', img)
-            cv.waitKey(1000)
+            cv.waitKey(100)
+        else:
+            print(fname)
     cv.destroyAllWindows()
 
     # calibration
@@ -57,7 +59,7 @@ def calib_n(inter_corner_shape, img_dir, img_type):
     print(("rotation vectors:\n"), rvecs)
     print(("translation vectors:\n"), tvecs)
 
-    np.savez('B.npz',mtx = mtx, dist = dist, rvecs = rvecs,tvecs = tvecs)
+    np.savez('B_r.npz',mtx = mtx, dist = dist, rvecs = rvecs,tvecs = tvecs)
     # calculate the error of reproject
     mean_error = 0
     for i in range(len(objpoints)):
@@ -88,7 +90,7 @@ def dedistortion(img_dir, img_type, save_dir, mtx, dist):
 
 if __name__ == '__main__':
     inter_corner_shape = (7, 6)
-    img_dir = "imag/chessboard"
+    img_dir = "imag/chessboard/right"
     img_type = "jpg"
     mtx, dist= calib_n(inter_corner_shape, img_dir, img_type)
     save_dir = "./imag/save_dedistortion"
