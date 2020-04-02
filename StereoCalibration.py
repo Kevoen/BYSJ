@@ -66,21 +66,24 @@ def stereo_cal(inter_corner_shape, img_dir, img_type):
             imgpoints_l.append(corners_l)
             imgpoints_r.append(corners_r)
 
-            # Draw and display the corners
-            plt.subplot(121)
-            cv.drawChessboardCorners(img_l, (w, h), corners2_l, ret_l)
-            plt.imshow(img_l)
-            plt.subplot(122)
-            cv.drawChessboardCorners(img_r, (w, h), corners2_r, ret_r)
-            plt.imshow(img_r)
-            plt.show()
+            # # Draw and display the corners
+            # plt.subplot(121)
+            # cv.drawChessboardCorners(img_l, (w, h), corners2_l, ret_l)
+            # plt.imshow(img_l)
+            # plt.subplot(122)
+            # cv.drawChessboardCorners(img_r, (w, h), corners2_r, ret_r)
+            # plt.imshow(img_r)
+            # plt.show()
+
+    # get shape
+    img_shape = gray_l.shape[::-1]
 
     ### calibration###
     #calicrate left camera
-    ret, M1, d1, r1, t1 = cv.calibrateCamera(objpoints, imgpoints_l, gray_l.shape[::-1], None, None)
+    ret, M1, d1, r1, t1 = cv.calibrateCamera(objpoints, imgpoints_l, img_shape, None, None)
 
     # calicrate right camera
-    ret, M2, d2, r2, t2 = cv.calibrateCamera(objpoints, imgpoints_r, gray_r.shape[::-1], None, None)
+    ret, M2, d2, r2, t2 = cv.calibrateCamera(objpoints, imgpoints_r, img_shape, None, None)
 
     # stereo calibration
     flags = (cv.CALIB_FIX_K5 + cv.CALIB_FIX_K6)
@@ -97,36 +100,99 @@ def stereo_cal(inter_corner_shape, img_dir, img_type):
     ret, M1, d1, M2, d2, R, T, E, F = cv.stereoCalibrate(
         objpoints, imgpoints_l,
         imgpoints_r, M1, d1, M2,
-        d2, gray_l.shape[::-1],
+        d2, img_shape,
         criteria=stereocalib_criteria,
         flags=flags)
 
+
+    np.savez('B.npz', M1=M1, d1=d1, M2=M2, d2=d2, R=R, T=T, F=F, E=E, img_shape=img_shape)
+
+    ## calculate the error of reproject
+    mean_error = 0
+    for i in range(len(objpoints)):
+        imgpoints2, _ = cv.projectPoints(objpoints[i], r1[i], t1[i], M1, d1)
+        error = cv.norm(imgpoints_l[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
+        mean_error += error
+    print("left:")
+    print( "total error: {}".format(mean_error/len(objpoints)) )
+
+    for i in range(len(objpoints)):
+        imgpoints2, _ = cv.projectPoints(objpoints[i], r2[i], t2[i], M2, d2)
+        error = cv.norm(imgpoints_r[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
+        mean_error += error
+    print("right:")
+    print( "total error: {}".format(mean_error/len(objpoints)) )
+
+    # return img_shape
+
+
+def stereo_rect(inter_corner_shape, img_dir, img_type):
+
+    #load M,dist,R,T,E
+    B = np.load('B.npz')
+    M1 = B['M1']
+    M2 = B['M2']
+    d1 = B['d1']
+    d2 = B['d2']
+    R = B['R']
+    T = B['T']
+    E = B['E']
+    F = B['F']
+
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    w, h = inter_corner_shape
+
+    # images_left = glob.glob(img_dir + os.sep + 'left01.' + img_type)
+    # images_right = glob.glob(img_dir + os.sep + 'right01.' + img_type)
+
+    img_l = cv.imread("imag/chessboard/left01.jpg")
+    img_r = cv.imread("imag/chessboard/right01.jpg")
+
+    # convert to cv2
+    img_l = cv.cvtColor(img_l, cv.COLOR_BGR2GRAY)
+    img_r = cv.cvtColor(img_r, cv.COLOR_BGR2GRAY)
+
+    img_shape = img_l.shape[::-1]
+
+    ##rectiftication and undistrotion##
     # get new optimal camera matrix
-    newCamMtx1, roi1 = cv.getOptimalNewCameraMatrix(M1, d1, gray_l.shape[::-1], 0, gray_l.shape[::-1])
-    newCamMtx2, roi2 = cv.getOptimalNewCameraMatrix(M2, d2, gray_l.shape[::-1], 0, gray_l.shape[::-1])
+    newCamMtx1, roi1 = cv.getOptimalNewCameraMatrix(M1, d1, img_shape, 0, img_shape)
+    newCamMtx2, roi2 = cv.getOptimalNewCameraMatrix(M2, d2, img_shape, 0, img_shape)
 
-    np.savez('B.npz', M1=M1, d1=d1, M2=M2, d2=d2, R=R, T=T, newCamMtx1=newCamMtx1, newCamMtx2=newCamMtx2)
+    #Computes rectification transforms for each head of a calibrated stereo camera.
+    (rectification_l, rectification_r, projection_l,projection_r, disparityToDepthMap, ROI_l, ROI_r) = cv.stereoRectify(
+        M1, d1, M2, d2, img_shape, R, T,None, None, None, None, None,alpha=0)
 
-    # # calculate the error of reproject
-    # mean_error = 0
-    # for i in range(len(objpoints)):
-    #     imgpoints2, _ = cv.projectPoints(objpoints[i], R[i], T[i], newCamMtx1, d1)
-    #     error = cv.norm(imgpoints_l[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
-    #     mean_error += error
-    # print("left:")
-    # print( "total error: {}".format(mean_error/len(objpoints)) )
-    #
-    # for i in range(len(objpoints)):
-    #     imgpoints2, _ = cv.projectPoints(objpoints[i], R[i], T[i], newCamMtx2, d2)
-    #     error = cv.norm(imgpoints_r[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
-    #     mean_error += error
-    # print("right:")
-    # print( "total error: {}".format(mean_error/len(objpoints)) )
+    #Computes the undistortion and rectification transformation map.
+    # leftMapX, leftMapY = cv.initUndistortRectifyMap(M1, d1, rectification_l,projection_l,img_shape, cv.CV_32FC1)
+    # rightMapX, rightMapY = cv.initUndistortRectifyMap(M2, d2, rectification_r, projection_r,img_shape, cv.CV_32FC1)
 
-    return newCamMtx1, newCamMtx2, d1, d2, R, T, E, F
+    leftMapX, leftMapY = cv.initUndistortRectifyMap(M1, d1, None, newCamMtx1, img_shape, cv.CV_32FC1)
+    rightMapX, rightMapY = cv.initUndistortRectifyMap(M2, d2, None, newCamMtx2, img_shape, cv.CV_32FC1)
+
+    #Applies a generic geometrical transformation to an image.
+    imglCalRect = cv.remap(img_l, leftMapX, leftMapY, cv.INTER_LINEAR)
+    imgrCalRect = cv.remap(img_r, rightMapX, rightMapY, cv.INTER_LINEAR)
+
+    # x1, y1, w1, h1 = roi1
+    # x2, y2, w2, h2 = roi2
+    # imglCalRect = imglCalRect[y1:y1 + h1, x1:x1 + w1]
+    # imgrCalRect = imgrCalRect[y2:y2 + h2, x2:x2 + w2]
+    cv.imshow("calibRect_l", imglCalRect)
+    cv.imshow("calibRect_r", imgrCalRect)
+    cv.imshow("img",img_l)
+    cv.waitKey()
+    cv.destroyAllWindows()
+
+    # numpyHorizontalCalibRect = np.hstack((imglCalRect, imgrCalRect))
+    # cv.imshow("calibRect", numpyHorizontalCalibRect)
+    # cv.waitKey(500)
+    # cv.destroyAllWindows()
+
 
 if __name__ == '__main__':
     inter_corner_shape = (7, 6)
     img_dir = "imag/chessboard"
     img_type = "jpg"
-    stereo_cal(inter_corner_shape, img_dir, img_type)
+    # stereo_cal(inter_corner_shape, img_dir, img_type)
+    stereo_rect(inter_corner_shape, img_dir, img_type)
