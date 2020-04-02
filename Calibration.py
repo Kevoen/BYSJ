@@ -90,7 +90,7 @@ def dedistortion(img_dir, img_type, save_dir, mtx, dist):
 
 if __name__ == '__main__':
     inter_corner_shape = (7, 6)
-    img_dir = "imag/chessboard/right"
+    img_dir = "imag/chessboard/left"
     img_type = "jpg"
     mtx, dist= calib_n(inter_corner_shape, img_dir, img_type)
     save_dir = "./imag/save_dedistortion"
