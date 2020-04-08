@@ -227,31 +227,33 @@ try:
         print(img_l_name)
         print(img_r_name)
 
-        # ### SHOW RESULTS ###
-        # # calculate point arrays for epipolar lines
-        # lineThickness = 1
-        # lineColor = (0, 255, 0)
-        # numLines = 20
-        # interv = round(img_shape[0] / numLines)
-        # x1 = np.zeros((numLines, 1))
-        # y1 = np.zeros((numLines, 1))
-        # x2 = np.full((numLines, 1), (3*img_shape[1]))
-        # y2 = np.zeros((numLines, 1))
-        # for jj in range(0, numLines):
-        #     y1[jj] = jj * interv
-        # y2 = y1
-        #
-        # for jj in range(0, numLines):
-        #     cv2.line(numpyHorizontalCalibRect, (x1[jj], y1[jj]), (x2[jj], y2[jj]),
-        #              lineColor, lineThickness)
-        #     cv2.line(numpyHorizontalUncalibRect, (x1[jj], y1[jj]), (x2[jj], y2[jj]),
-        #              lineColor, lineThickness)
-        # cv2.namedWindow("calibRect", cv2.WINDOW_NORMAL)
-        # cv2.namedWindow("uncalibRect", cv2.WINDOW_NORMAL)
-        # cv2.imshow("calibRect", numpyHorizontalCalibRect)
-        # cv2.imshow("uncalibRect", numpyHorizontalUncalibRect)
-        # cv2.waitKey(500)
-        # cv2.destroyAllWindows()
+        ### SHOW RESULTS ###
+        # calculate point arrays for epipolar lines
+        lineThickness = 1
+        lineColor = (255, 255, 0)
+        numLines = 30
+        interv = round(img_shape[0] / numLines)
+        x1 = np.zeros((numLines, 1))
+        y1 = np.zeros((numLines, 1))
+        x2 = np.full((numLines, 1), (3*img_shape[1]))
+        y2 = np.zeros((numLines, 1))
+        for jj in range(0, numLines):
+            y1[jj] = jj * interv
+        y2 = y1
+
+        for jj in range(0, numLines):
+            cv2.line(numpyHorizontalCalibRect, (x1[jj], y1[jj]), (x2[jj], y2[jj]),
+                     lineColor, lineThickness)
+            cv2.line(numpyHorizontalUncalibRect, (x1[jj], y1[jj]), (x2[jj], y2[jj]),
+                     lineColor, lineThickness)
+            cv2.line(img_l,(x1[jj], y1[jj]), (x2[jj], y2[jj]),lineColor, lineThickness)
+        cv2.namedWindow("calibRect", cv2.WINDOW_NORMAL)
+        cv2.namedWindow("uncalibRect", cv2.WINDOW_NORMAL)
+        cv2.imshow("calibRect", numpyHorizontalCalibRect)
+        cv2.imshow("uncalibRect", numpyHorizontalUncalibRect)
+        cv2.imshow("left",img_l)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
 
 except (IOError, ValueError):
     print("An I/O error or a ValueError occurred")
