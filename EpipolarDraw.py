@@ -5,90 +5,75 @@
 # @Site    : 
 # @File    : EpipolarDraw.py
 # @Software: PyCharm
+
 import cv2
 import numpy as np
-import os
+from matplotlib import pyplot as plt
 
-# find object corners from chessboard pattern  and create a correlation with image corners
-def getCorners(images, chessboard_size, show=True):
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+img1 = cv2.imread('imag/teddy/im2.ppm',0)  #queryimage # left image
+img2 = cv2.imread('imag/teddy/im6.ppm',0) #trainimage # right image
 
-    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-    objp = np.zeros((chessboard_size[1] * chessboard_size[0], 3), np.float32)
-    objp[:, :2] = np.mgrid[0:chessboard_size[0], 0:chessboard_size[1]].T.reshape(-1, 2)*3.88 # multiply by 3.88 for large chessboard squares
+sift = cv2.xfeatures2d.SIFT_create()
 
-    # Arrays to store object points and image points from all the images.
-    objpoints = [] # 3d point in real world space
-    imgpoints = [] # 2d points in image plane.
+# find the keypoints and descriptors with SIFT
+kp1, des1 = sift.detectAndCompute(img1,None)
+kp2, des2 = sift.detectAndCompute(img2,None)
 
-    for image in images:
-        frame = cv2.imread(image)
-        # height, width, channels = frame.shape # get image parameters
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        ret, corners = cv2.findChessboardCorners(gray, chessboard_size, None)   # Find the chess board corners
-        if ret:                                                                         # if corners were found
-            objpoints.append(objp)
-            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)    # refine corners
-            imgpoints.append(corners2)                                                  # add to corner array
+# FLANN parameters
+FLANN_INDEX_KDTREE = 0
+index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+search_params = dict(checks=50)
 
-            if show:
-                # Draw and display the corners
-                frame = cv2.drawChessboardCorners(frame, chessboard_size, corners2, ret)
-                cv2.imshow('frame', frame)
-                cv2.waitKey(100)
+flann = cv2.FlannBasedMatcher(index_params,search_params)
+matches = flann.knnMatch(des1,des2,k=2)
 
-    cv2.destroyAllWindows()             # close open windows
-    return objpoints, imgpoints, gray.shape[::-1]
+good = []
+pts1 = []
+pts2 = []
 
-# perform undistortion on provided image
-def undistort(image, mtx, dist):
-    img = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
-    image = os.path.splitext(image)[0]
-    h, w = img.shape[:2]
-    newcameramtx, _ = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-    dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
-    return dst
+# ratio test as per Lowe's paper
+for i,(m,n) in enumerate(matches):
+    if m.distance < 0.8*n.distance:
+        good.append(m)
+        pts2.append(kp2[m.trainIdx].pt)
+        pts1.append(kp1[m.queryIdx].pt)
 
-# draw the provided points on the image
-def drawPoints(img, pts, colors):
-    for pt, color in zip(pts, colors):
-        cv2.circle(img, tuple(pt[0]), 5, color, -1)
+pts1 = np.int32(pts1)
+pts2 = np.int32(pts2)
+F, mask = cv2.findFundamentalMat(pts1,pts2,cv2.FM_LMEDS)
 
-# draw the provided lines on the image
-def drawLines(img, lines, colors):
-    _, c, _ = img.shape
-    for r, color in zip(lines, colors):
-        x0, y0 = map(int, [0, -r[2]/r[1]])
-        x1, y1 = map(int, [c, -(r[2]+r[0]*c)/r[1]])
-        cv2.line(img, (x0, y0), (x1, y1), color, 1)
+# We select only inlier points
+pts1 = pts1[mask.ravel()==1]
+pts2 = pts2[mask.ravel()==1]
 
-if __name__ == '__main__':
+def drawlines(img1,img2,lines,pts1,pts2):
+    ''' img1 - image on which we draw the epilines for the points in img2
+        lines - corresponding epilines '''
+    r,c = img1.shape
+    img1 = cv2.cvtColor(img1,cv2.COLOR_GRAY2BGR)
+    img2 = cv2.cvtColor(img2,cv2.COLOR_GRAY2BGR)
+    for r,pt1,pt2 in zip(lines,pts1,pts2):
+        color = tuple(np.random.randint(0,255,3).tolist())
+        x0,y0 = map(int, [0, -r[2]/r[1] ])
+        x1,y1 = map(int, [c, -(r[2]+r[0]*c)/r[1] ])
+        img1 = cv2.line(img1, (x0,y0), (x1,y1), color,1)
+        img1 = cv2.circle(img1,tuple(pt1),5,color,-1)
+        img2 = cv2.circle(img2,tuple(pt2),5,color,-1)
+    return img1,img2
 
- # undistort our chosen images using the left and right camera and distortion matricies
-    imgL = undistort("2L/2L34.bmp", mtxL, distL)
-    imgR = undistort("2R/2R34.bmp", mtxR, distR)
-    imgL = cv2.cvtColor(imgL, cv2.COLOR_GRAY2BGR)
-    imgR = cv2.cvtColor(imgR, cv2.COLOR_GRAY2BGR)
+# Find epilines corresponding to points in right image (second image) and
+# drawing its lines on left image
+lines1 = cv2.computeCorrespondEpilines(pts2.reshape(-1,1,2), 2,F)
+lines1 = lines1.reshape(-1,3)
+img5,img6 = drawlines(img1,img2,lines1,pts1,pts2)
 
-    # use get corners to get the new image locations of the checcboard corners (undistort will have moved them a little)
-    _, imgpointsL, _ = getCorners(["2L34_undistorted.bmp"], chessboard_size, show=False)
-    _, imgpointsR, _ = getCorners(["2R34_undistorted.bmp"], chessboard_size, show=False)
+# Find epilines corresponding to points in left image (first image) and
+# drawing its lines on right image
+lines2 = cv2.computeCorrespondEpilines(pts1.reshape(-1,1,2), 1,F)
+lines2 = lines2.reshape(-1,3)
+img3,img4 = drawlines(img2,img1,lines2,pts2,pts1)
 
-    # get 3 image points of interest from each image and draw them
-    ptsL = np.asarray([imgpointsL[0][0], imgpointsL[0][10], imgpointsL[0][20]])
-    ptsR = np.asarray([imgpointsR[0][5], imgpointsR[0][15], imgpointsR[0][25]])
-    drawPoints(imgL, ptsL, colors[3:6])
-    drawPoints(imgR, ptsR, colors[0:3])
-
-    # find epilines corresponding to points in right image and draw them on the left image
-    epilinesR = cv2.computeCorrespondEpilines(ptsR.reshape(-1, 1, 2), 2, F)
-    epilinesR = epilinesR.reshape(-1, 3)
-    drawLines(imgL, epilinesR, colors[0:3])
-
-    # find epilines corresponding to points in left image and draw them on the right image
-    epilinesL = cv2.computeCorrespondEpilines(ptsL.reshape(-1, 1, 2), 1, F)
-    epilinesL = epilinesL.reshape(-1, 3)
-    drawLines(imgR, epilinesL, colors[3:6])
-
-    # combine the corresponding images into one and display them
-    combineSideBySide(imgL, imgR, "epipolar_lines", save=True)
+plt.figure(figsize=(50,50))
+plt.subplot(121),plt.imshow(img5)
+plt.subplot(122),plt.imshow(img3)
+plt.show()
