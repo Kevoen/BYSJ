@@ -10,8 +10,11 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img1 = cv2.imread('imag/teddy/im2.ppm',0)  #queryimage # left image
-img2 = cv2.imread('imag/teddy/im6.ppm',0) #trainimage # right image
+# img1 = cv2.imread('imag/teddy/im2.ppm',0)  #queryimage # left image
+# img2 = cv2.imread('imag/teddy/im6.ppm',0) #trainimage # right image
+
+img1 = cv2.imread('imag/box.png',0)          # queryImage
+img2 = cv2.imread('imag/box_in_scene.png',0) # trainImage
 
 sift = cv2.xfeatures2d.SIFT_create()
 
@@ -74,6 +77,6 @@ lines2 = lines2.reshape(-1,3)
 img3,img4 = drawlines(img2,img1,lines2,pts2,pts1)
 
 plt.figure(figsize=(50,50))
-plt.subplot(121),plt.imshow(img5)
-plt.subplot(122),plt.imshow(img3)
+plt.subplot(131),plt.imshow(img5)
+plt.subplot(132),plt.imshow(img3)
 plt.show()

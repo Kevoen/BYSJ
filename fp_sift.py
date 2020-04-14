@@ -89,8 +89,8 @@ t = cv2.getTickCount()
 img1 = cv2.imread('imag/box.png',0)          # queryImage
 img2 = cv2.imread('imag/box_in_scene.png',0) # trainImage
 
-img1 = cv2.imread('imag/teddy/im2.ppm',0) # queryImage
-img2 = cv2.imread('imag/teddy/im6.ppm',0) # trainImage
+# img1 = cv2.imread('imag/teddy/im2.ppm',0) # queryImage
+# img2 = cv2.imread('imag/teddy/im6.ppm',0) # trainImage
 
 # Initiate SIFT detector
 sift = cv2.xfeatures2d.SIFT_create()
@@ -131,6 +131,9 @@ if len(good)>MIN_MATCH_COUNT:
 
     img2 = cv2.polylines(img2,[np.int32(dst)],True,255,3, cv2.LINE_AA)
 
+    # 变换
+    warped_image = cv2.warpPerspective(img1, M, (img1.shape[1]+img2.shape[1], img2.shape[0]))
+    cv2.imshow('warped_image',warped_image)
 else:
     print("Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
     matchesMask = None
@@ -138,8 +141,9 @@ else:
 draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                    singlePointColor = (255,0,0),
                    matchesMask = matchesMask, # draw only inliers
-                   flags = 0)
+                   flags = 2)
                     #flags = 0 时显示singlePoints
+
 
 img3 = cv2.drawMatches(img1,kp1,img2,kp2,good,None,**draw_params)
 

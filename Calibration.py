@@ -9,6 +9,8 @@ import numpy as np
 import cv2 as cv
 import glob
 import os
+import PIL.ExifTags
+import PIL.Image
 
 def calib_n(inter_corner_shape, img_dir, img_type):
     # termination criteria
@@ -26,9 +28,10 @@ def calib_n(inter_corner_shape, img_dir, img_type):
 
     # images = glob.glob('imag/chessboard/*.jpg')
     images = glob.glob(img_dir + os.sep + '**.' + img_type)
-
+    gray = None
     for fname in images:
         img = cv.imread(fname)
+
         gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
         # Find the chess board corners
@@ -39,17 +42,24 @@ def calib_n(inter_corner_shape, img_dir, img_type):
             objpoints.append(objp)
             corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
             imgpoints.append(corners)
-
-            # Draw and display the corners
-            cv.drawChessboardCorners(img, (w, h), corners2, ret)
-            cv.imshow('img', img)
-            cv.waitKey(100)
+            print(fname,"successful!!")
+            # # Draw and display the corners
+            # cv.drawChessboardCorners(img, (w, h), corners2, ret)
+            # cv.imshow('img', img)
+            # cv.waitKey()
         else:
             print(fname)
     cv.destroyAllWindows()
 
     # calibration
     ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+    # Save parameters into numpy file
+    np.save("./camera_params/ret", ret)
+    np.save("./camera_params/K", mtx)
+    np.save("./camera_params/dist", dist)
+    np.save("./camera_params/rvecs", rvecs)
+    np.save("./camera_params/tvecs", tvecs)
+
 
     print(("ret:"), ret)
     print(("internal matrix:\n"), mtx)
@@ -59,7 +69,6 @@ def calib_n(inter_corner_shape, img_dir, img_type):
     print(("rotation vectors:\n"), rvecs)
     print(("translation vectors:\n"), tvecs)
 
-    np.savez('B_r.npz',mtx = mtx, dist = dist, rvecs = rvecs,tvecs = tvecs)
     # calculate the error of reproject
     mean_error = 0
     for i in range(len(objpoints)):
@@ -89,12 +98,13 @@ def dedistortion(img_dir, img_type, save_dir, mtx, dist):
 
 
 if __name__ == '__main__':
-    inter_corner_shape = (7, 6)
-    img_dir = "imag/chessboard/left"
+    inter_corner_shape = (7, 5)
+    img_dir = "imag/chessboard"
+    # img_dir = "3DReconstruction/Calibration/calibration_images"
     img_type = "jpg"
     mtx, dist= calib_n(inter_corner_shape, img_dir, img_type)
-    save_dir = "./imag/save_dedistortion"
-    if (not os.path.exists(save_dir)):
-        os.makedirs(save_dir)
-    dedistortion(img_dir, img_type, save_dir, mtx, dist)
-    calib_n(inter_corner_shape, save_dir, img_type)
+    # save_dir = "./imag/save_dedistortion"
+    # if (not os.path.exists(save_dir)):
+    #     os.makedirs(save_dir)
+    # dedistortion(img_dir, img_type, save_dir, mtx, dist)
+    # calib_n(inter_corner_shape, save_dir, img_type)

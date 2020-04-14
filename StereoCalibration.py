@@ -65,7 +65,7 @@ def stereo_cal(inter_corner_shape, img_dir, img_type):
             objpoints.append(objp)
             imgpoints_l.append(corners_l)
             imgpoints_r.append(corners_r)
-
+            print(fname,"successful!!")
             # # Draw and display the corners
             # plt.subplot(121)
             # cv.drawChessboardCorners(img_l, (w, h), corners2_l, ret_l)
@@ -104,9 +104,10 @@ def stereo_cal(inter_corner_shape, img_dir, img_type):
         criteria=stereocalib_criteria,
         flags=flags)
 
+    print(T)
+
 
     np.savez('B.npz', M1=M1, d1=d1, M2=M2, d2=d2, R=R, T=T, F=F, E=E, img_shape=img_shape)
-
     ## calculate the error of reproject
     mean_error = 0
     for i in range(len(objpoints)):
@@ -194,5 +195,5 @@ if __name__ == '__main__':
     inter_corner_shape = (7, 6)
     img_dir = "imag/chessboard"
     img_type = "jpg"
-    # stereo_cal(inter_corner_shape, img_dir, img_type)
-    stereo_rect(inter_corner_shape, img_dir, img_type)
+    stereo_cal(inter_corner_shape, img_dir, img_type)
+    # stereo_rect(inter_corner_shape, img_dir, img_type)

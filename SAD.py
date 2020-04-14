@@ -34,13 +34,13 @@ rimg= cv.cvtColor(rraw,cv.COLOR_BGR2GRAY)
 limg=np.asanyarray(limg,dtype=np.double)
 rimg=np.asanyarray(rimg,dtype=np.double)
 img_size=np.shape(limg)[0:2]
-plt.imshow(limg)
-plt.show()
-plt.imshow(rimg)
-plt.show()
+# plt.imshow(limg)
+# plt.show()
+# plt.imshow(rimg)
+# plt.show()
 
 #-------------------------------
-'''这一部分是加速后的SAD算法，具体做法是先计算右图按照视差由0到maxDisparity减去左图所得的矩阵'''
+'''这一部分是加速后的SAD算法，具体做 法是先计算右图按照视差由0到maxDisparity减去左图所得的矩阵'''
 #------------------------------
 tic1=time.time()
 imgDiff=np.zeros((img_size[0],img_size[1],maxDisparity))

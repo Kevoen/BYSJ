@@ -219,6 +219,8 @@ try:
         numpyHorizontalUncalibRect = np.hstack((imglUncalRect, imgrUncalRect))
 
         # save
+        cv2.imwrite("imag/chessboard/left" + os.sep + img_l_name, img_l_undis)
+        cv2.imwrite("imag/chessboard/right" + os.sep + img_r_name, img_r_undis)
         cv2.imwrite("imag/ImgCalRect" + os.sep + img_l_name, imglCalRect)
         cv2.imwrite("imag/ImgCalRect" + os.sep + img_r_name, imgrCalRect)
         cv2.imwrite("imag/ImgUncalRect" + os.sep + img_l_name, imglCalRect)

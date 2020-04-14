@@ -10,29 +10,47 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-imgL = cv2.imread('imag/Monopoly/view1.png')
-imgR = cv2.imread('imag/Monopoly/view5.png')
+imgL = cv2.imread('imag/teddy/im2.ppm')
+imgR = cv2.imread('imag/teddy/im6.ppm')
 
 # disparity range tuning
-window_size = 3
-min_disp = 0
-num_disp = 320 - min_disp
+window_size = 5
+min_disp = -1
+max_disp = 79
+num_disp = max_disp - min_disp
 
 stereo = cv2.StereoSGBM_create(
-    minDisparity=0,
-    numDisparities=240,  # max_disp has to be dividable by 16 f. E. HH 192, 256
+    minDisparity=min_disp,
+    numDisparities=num_disp,
     blockSize=3,
-    P1=8 * 3 * window_size ** 2,
-    # wsize default 3; 5; 7 for SGBM reduced size image; 15 for SGBM full size image (1300px and above); 5 Works nicely
-    P2=32 * 3 * window_size ** 2,
-    disp12MaxDiff=1,
     uniquenessRatio=15,
     speckleWindowSize=0,
     speckleRange=2,
-    preFilterCap=63,
-    mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
+    disp12MaxDiff=1,
+    P1=8 * 3 * window_size ** 2,
+    P2=32 * 3 * window_size ** 2,
+    # preFilterCap=63,
+    # mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
 )
-disparity = stereo.compute(imgL, imgR).astype(np.float32) / 16.0
-plt.imshow(disparity, 'gray')
+disparity = stereo.compute(imgL, imgR).astype(np.float32)/ 16.0
+
+size1, size2 = disparity.shape
+
+B = np.load("B.npz")
+M = B['M1']
+f = M[0,0]
+print(M,f,disparity)
+depth=np.ones_like(disparity,dtype=np.uint8)
+for i in range(size1):
+    for j in range(size2):
+        if abs(disparity[i][j])<5: ##噪音
+            depth[i][j]=0
+        else:
+            depth[i][j]=f*100/disparity[i][j]
+
+print(depth)
+plt.title('disparity and depth')
+plt.subplot(121), plt.imshow(disparity)
+plt.subplot(122), plt.imshow(depth)
 plt.show()
 
