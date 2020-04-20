@@ -44,7 +44,7 @@ def calib_normal(inter_corner_shape, img_dir, img_type):
         #绘制显示角点
         img = cv2.drawChessboardCorners(img, (w, h), corners2, ret)
         cv2.imshow('FoundCorners', img)
-        cv2.waitKey(500)
+        cv2.waitKey()
 
     cv2.destroyAllWindows()
 
