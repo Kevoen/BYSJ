@@ -87,3 +87,8 @@ cv2.imshow("img1", img1_kp)
 cv2.imshow("img2", img2_kp)
 cv2.waitKey()
 cv2.destroyAllWindows()
+
+# plt.subplot(121),plt.imshow(img1_kp)
+# plt.subplot(122),plt.imshow(img2_kp)
+# plt.show()
+# plt.imshow(img3),plt.show()
