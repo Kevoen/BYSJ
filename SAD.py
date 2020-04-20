@@ -62,6 +62,26 @@ for x in range(0,img_size[0]):
         if np.abs(val[0]-val[1])>10:
             val_id=np.argsort(imgDiff[x,y,:])
             dispMap[x,y]=val_id[0]/maxDisparity*255#其实dispmap计算的是视差的大小，如果视差大，那么就相当于两张图片中同样物品的位移大，就是距离近
+# Show disparity map before generating 3D cloud to verify that point cloud will be usable.
+size1, size2 = dispMap.shape
+
+B = np.load("B.npz")
+M = B['M1']
+f = M[0,0]
+print(M,f,dispMap)
+depth=np.ones_like(dispMap,dtype=np.uint8)
+for i in range(size1):
+    for j in range(size2):
+        if abs(dispMap[i][j])<5: ##噪音
+            depth[i][j]=0
+        else:
+            depth[i][j]=f*65/dispMap[i][j]
+
+print(depth)
+
 print('用时:',time.time()-tic1)
-plt.imshow(dispMap)
+plt.subplot(221), plt.imshow(limg)
+plt.subplot(222), plt.imshow(rimg)
+plt.subplot(223), plt.imshow(dispMap)
+plt.subplot(224), plt.imshow(depth)
 plt.show()
