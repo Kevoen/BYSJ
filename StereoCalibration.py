@@ -66,14 +66,18 @@ def stereo_cal(inter_corner_shape, img_dir, img_type):
             imgpoints_l.append(corners_l)
             imgpoints_r.append(corners_r)
             print(fname,"successful!!")
-            # # Draw and display the corners
-            # plt.subplot(121)
-            # cv.drawChessboardCorners(img_l, (w, h), corners2_l, ret_l)
-            # plt.imshow(img_l)
-            # plt.subplot(122)
-            # cv.drawChessboardCorners(img_r, (w, h), corners2_r, ret_r)
-            # plt.imshow(img_r)
+            # Draw and display the corners
+
+            cv.drawChessboardCorners(img_l, (w, h), corners2_l, ret_l)
+            cv.drawChessboardCorners(img_r, (w, h), corners2_r, ret_r)
+
+            # plt.subplot(121),plt.imshow(img_l)
+            # plt.subplot(122),plt.imshow(img_r)
             # plt.show()
+            cv.imshow("imgL",img_l)
+            cv.imshow("imgR",img_r)
+            cv.waitKey()
+            cv.destroyAllWindows()
 
     # get shape
     img_shape = gray_l.shape[::-1]
@@ -104,7 +108,9 @@ def stereo_cal(inter_corner_shape, img_dir, img_type):
         criteria=stereocalib_criteria,
         flags=flags)
 
-    print(T)
+    print("K:\n", M1)
+    print("R:\n", R)
+    print("T:\n",T)
 
 
     np.savez('B.npz', M1=M1, d1=d1, M2=M2, d2=d2, R=R, T=T, F=F, E=E, img_shape=img_shape)
