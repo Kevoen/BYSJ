@@ -48,9 +48,9 @@ for i in range(size1):
         else:
             depth[i][j]=f*100/disparity[i][j]
 
-print(depth)
-plt.title('disparity and depth')
-plt.subplot(121), plt.imshow(disparity)
-plt.subplot(122), plt.imshow(depth)
+plt.subplot(221), plt.imshow(imgL)
+plt.subplot(222), plt.imshow(imgR)
+plt.subplot(223), plt.imshow(disparity)
+plt.subplot(224), plt.imshow(depth)
 plt.show()
 
