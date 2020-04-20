@@ -26,8 +26,8 @@ surf.setHessianThreshold(5000)
 kp1, des1 = surf.detectAndCompute(img1,None)
 kp2, des2 = surf.detectAndCompute(img2,None)
 
-img1_kp = cv2.drawKeypoints(img1, kp1, None, (0,255,0), 4)
-img2_kp = cv2.drawKeypoints(img2, kp2, None, (0,255,0), 4)
+img1_kp = cv2.drawKeypoints(img1, kp1, None, (0,255,0), 0)
+img2_kp = cv2.drawKeypoints(img2, kp2, None, (0,255,0), 0)
 
 # # BFMatcher with default params
 # bf = cv2.BFMatcher()
@@ -81,3 +81,8 @@ cv2.imshow("img1", img1_kp)
 cv2.imshow("img2", img2_kp)
 cv2.waitKey()
 cv2.destroyAllWindows()
+
+# plt.subplot(121),plt.imshow(img1_kp)
+# plt.subplot(122),plt.imshow(img2_kp)
+# plt.show()
+# plt.imshow(img3),plt.show()
