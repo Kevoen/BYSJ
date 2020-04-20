@@ -43,10 +43,10 @@ def calib_n(inter_corner_shape, img_dir, img_type):
             corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
             imgpoints.append(corners)
             print(fname,"successful!!")
-            # # Draw and display the corners
-            # cv.drawChessboardCorners(img, (w, h), corners2, ret)
-            # cv.imshow('img', img)
-            # cv.waitKey()
+            # Draw and display the corners
+            cv.drawChessboardCorners(img, (w, h), corners2, ret)
+            cv.imshow('img', img)
+            cv.waitKey()
         else:
             print(fname)
     cv.destroyAllWindows()
@@ -103,8 +103,8 @@ if __name__ == '__main__':
     # img_dir = "3DReconstruction/Calibration/calibration_images"
     img_type = "jpg"
     mtx, dist= calib_n(inter_corner_shape, img_dir, img_type)
-    # save_dir = "./imag/save_dedistortion"
-    # if (not os.path.exists(save_dir)):
-    #     os.makedirs(save_dir)
-    # dedistortion(img_dir, img_type, save_dir, mtx, dist)
-    # calib_n(inter_corner_shape, save_dir, img_type)
+    save_dir = "./imag/save_dedistortion"
+    if (not os.path.exists(save_dir)):
+        os.makedirs(save_dir)
+    dedistortion(img_dir, img_type, save_dir, mtx, dist)
+    calib_n(inter_corner_shape, save_dir, img_type)
