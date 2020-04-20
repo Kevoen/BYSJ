@@ -13,11 +13,11 @@ from matplotlib import pyplot as plt
 MIN_MATCH_COUNT = 10
 t = cv2.getTickCount()
 
-# img1 = cv2.imread('imag/box.png',0)          # queryImage
-# img2 = cv2.imread('imag/box_in_scene.png',0) # trainImage
+img1 = cv2.imread('imag/box.png',0)          # queryImage
+img2 = cv2.imread('imag/box_in_scene.png',0) # trainImage
 
-img1 = cv2.imread('imag/teddy/im2.ppm',0) # queryImage
-img2 = cv2.imread('imag/teddy/im6.ppm',0) # trainImage
+# img1 = cv2.imread('imag/teddy/im2.ppm',0) # queryImage
+# img2 = cv2.imread('imag/teddy/im6.ppm',0) # trainImage
 
 # Initiate KAZE detector
 # kaze = cv2.KAZE_create()
@@ -88,3 +88,8 @@ cv2.imshow("img1", img1_kp)
 cv2.imshow("img2", img2_kp)
 cv2.waitKey()
 cv2.destroyAllWindows()
+
+# plt.subplot(121),plt.imshow(img1_kp)
+# plt.subplot(122),plt.imshow(img2_kp)
+# plt.show()
+# plt.imshow(img3),plt.show()
