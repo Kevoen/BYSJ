@@ -90,8 +90,10 @@ for i in range(size1):
 
 print(depth)
 plt.title('disparity and depth')
-plt.subplot(121), plt.imshow(disparity)
-plt.subplot(122), plt.imshow(depth)
+plt.subplot(221), plt.imshow(imgL)
+plt.subplot(222), plt.imshow(imgR)
+plt.subplot(223), plt.imshow(disparity)
+plt.subplot(224), plt.imshow(depth)
 plt.show()
 
 # Generate  point cloud.
@@ -115,23 +117,24 @@ Q2 = np.float32([[1,0,0,0],
     [0,-1,0,0],
     [0,0,focal_length*0.05,0], #Focal length multiplication obtained experimentally.
     [0,0,0,1]])
-#Reproject points into 3D
+# Reproject points into 3D
 points_3D = cv2.reprojectImageTo3D(disparity, Q2)
 
-#Get color points
+# Get color points
 colors = cv2.cvtColor(imgL, cv2.COLOR_BGR2RGB)
 
-#Get rid of points with value 0 (i.e no depth)
+# Get rid of points with value 0 (i.e no depth)
 mask_map = disparity > disparity.min()
 
-#Mask colors and points.
+# Mask colors and points.
 output_points = points_3D[mask_map]
 output_colors = colors[mask_map]
-
-#Define name for output file
+np.savez('output_points.npz', points = output_points)
+np.savez('output_colors.npz', colors = output_colors)
+# Define name for output file
 output_file = 'reconstructed.ply'
 
-#Generate point cloud
+# Generate point cloud
 print ("\n Creating the output file... \n")
 create_output(output_points, output_colors, output_file)
 
