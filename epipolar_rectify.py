@@ -102,18 +102,6 @@ try:
     stereocalib_criteria = (cv2.TERM_CRITERIA_MAX_ITER +
                     cv2.TERM_CRITERIA_EPS, 100, 1e-5)
 
-    #flags = 0
-    #flags = cv2.CALIB_USE_INTRINSIC_GUESS
-    #flags = cv2.CALIB_FIX_PRINCIPAL_POINT
-    #flags = cv2.CALIB_FIX_ASPECT_RATIO
-    #flags = cv2.CALIB_ZERO_TANGENT_DIST
-    #flags = cv2.CALIB_FIX_INTRINSIC
-    #flags = cv2.CALIB_FIX_FOCAL_LENGTH
-    #flags = cv2.CALIB_FIX_K1...6
-    #flags = cv2.CALIB_RATIONAL_MODEL
-    #flags = cv2.CALIB_THIN_PRISM_MODEL
-    #flags = cv2.CALIB_SAME_FOCAL_LENGTH
-    #flags = cv2.CALIB_FIX_S1_S2_S3_S4
 
     flags = (cv2.CALIB_FIX_PRINCIPAL_POINT | cv2.CALIB_FIX_ASPECT_RATIO | cv2.CALIB_FIX_FOCAL_LENGTH |
          cv2.CALIB_FIX_INTRINSIC | cv2.CALIB_FIX_K3 | cv2.CALIB_FIX_K4 | cv2.CALIB_FIX_K5 |
@@ -132,7 +120,6 @@ try:
     # get new optimal camera matrix
     newCamMtx1, roi1 = cv2.getOptimalNewCameraMatrix(M1, d1, img_shape, 0, img_shape)
     newCamMtx2, roi2 = cv2.getOptimalNewCameraMatrix(M2, d2, img_shape, 0, img_shape)
-
 
 
     # rectification and undistortion maps which can be used directly to correct the stereo pair
@@ -218,13 +205,13 @@ try:
         imgrUncalRect = cv2.warpPerspective(img_r_undis, uncRectMtx2, img_shape)
         numpyHorizontalUncalibRect = np.hstack((imglUncalRect, imgrUncalRect))
 
-        # save
-        cv2.imwrite("imag/chessboard/left" + os.sep + img_l_name, img_l_undis)
-        cv2.imwrite("imag/chessboard/right" + os.sep + img_r_name, img_r_undis)
-        cv2.imwrite("imag/ImgCalRect" + os.sep + img_l_name, imglCalRect)
-        cv2.imwrite("imag/ImgCalRect" + os.sep + img_r_name, imgrCalRect)
-        cv2.imwrite("imag/ImgUncalRect" + os.sep + img_l_name, imglCalRect)
-        cv2.imwrite("imag/ImgUncalRect" + os.sep + img_r_name, imgrCalRect)
+        # # save
+        # cv2.imwrite("imag/chessboard/left" + os.sep + img_l_name, img_l_undis)
+        # cv2.imwrite("imag/chessboard/right" + os.sep + img_r_name, img_r_undis)
+        # cv2.imwrite("imag/ImgCalRect" + os.sep + img_l_name, imglCalRect)
+        # cv2.imwrite("imag/ImgCalRect" + os.sep + img_r_name, imgrCalRect)
+        # cv2.imwrite("imag/ImgUncalRect" + os.sep + img_l_name, imglCalRect)
+        # cv2.imwrite("imag/ImgUncalRect" + os.sep + img_r_name, imgrCalRect)
 
         print(img_l_name)
         print(img_r_name)
