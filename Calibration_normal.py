@@ -25,7 +25,7 @@ def calib_normal(inter_corner_shape, img_dir, img_type):
     objpoints = []      #世界空间的三维点
     imgpoints = []      #图像平面的二维点
 
-    images = glob.glob(img_dir + os.sep + '**.' + img_type)
+    images = glob.glob(img_dir + os.sep + 'left/**.' + img_type)
 
     for fname in images:
         img = cv2.imread(fname)
