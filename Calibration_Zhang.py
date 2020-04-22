@@ -31,7 +31,7 @@ def calib_zhang(inter_corner_shape, size_per_grid, img_dir, img_type):
     obj_points = []  # the points in world space
     img_points = []  # the points in image space (relevant to obj_points)
 
-    images = glob.glob(img_dir + os.sep + '**.' + img_type)
+    images = glob.glob(img_dir + os.sep + 'left/**.' + img_type)
 
     for fname in images:
         img = cv2.imread(fname)
