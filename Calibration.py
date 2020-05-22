@@ -98,13 +98,13 @@ def dedistortion(img_dir, img_type, save_dir, mtx, dist):
 
 
 if __name__ == '__main__':
-    inter_corner_shape = (7, 5)
-    img_dir = "imag/chessboard"
+    inter_corner_shape = (10, 7)
+    img_dir = "imag/mychessborad/left"
     # img_dir = "3DReconstruction/Calibration/calibration_images"
     img_type = "jpg"
     mtx, dist= calib_n(inter_corner_shape, img_dir, img_type)
-    save_dir = "./imag/save_dedistortion"
-    if (not os.path.exists(save_dir)):
-        os.makedirs(save_dir)
-    dedistortion(img_dir, img_type, save_dir, mtx, dist)
-    calib_n(inter_corner_shape, save_dir, img_type)
+    # save_dir = "./imag/save_dedistortion"
+    # if (not os.path.exists(save_dir)):
+    #     os.makedirs(save_dir)
+    # dedistortion(img_dir, img_type, save_dir, mtx, dist)
+    # calib_n(inter_corner_shape, save_dir, img_type)
