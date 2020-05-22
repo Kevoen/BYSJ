@@ -92,12 +92,12 @@ def dedistortion(img_dir, img_type, save_dir, mat_inter, coff_dis):
 if __name__ == '__main__':
     inter_corner_shape = (6, 7)
     size_per_grid = 0.02
-    img_dir = "imag/chessboard"
+    img_dir = "imag/chessboard/left"
     img_type = "jpg"
     # calibrate the camera
     mat_inter, coff_dis = calib_zhang(inter_corner_shape, size_per_grid, img_dir, img_type)
     # dedistort and save the dedistortion result.
-    save_dir = "./imag/save_dedistortion"
-    if (not os.path.exists(save_dir)):
-        os.makedirs(save_dir)
-    dedistortion(img_dir, img_type, save_dir, mat_inter, coff_dis)
+    # save_dir = "./imag/save_dedistortion"
+    # if (not os.path.exists(save_dir)):
+    #     os.makedirs(save_dir)
+    # dedistortion(img_dir, img_type, save_dir, mat_inter, coff_dis)
