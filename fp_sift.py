@@ -87,11 +87,14 @@ from matplotlib import pyplot as plt
 MIN_MATCH_COUNT = 10
 t = cv2.getTickCount()
 
-img1 = cv2.imread('imag/box.png',0)          # queryImage
-img2 = cv2.imread('imag/box_in_scene.png',0) # trainImage
+# img1 = cv2.imread('imag/box.png',0)          # queryImage
+# img2 = cv2.imread('imag/box_in_scene.png',0) # trainImage
 
-# img1 = cv2.imread('imag/teddy/im2.ppm',0) # queryImage
-# img2 = cv2.imread('imag/teddy/im6.ppm',0) # trainImage
+# img1 = cv2.imread('imag/mychessborad/fan01.jpg',0) # queryImage
+# img2 = cv2.imread('imag/mychessborad/fan02.jpg',0) # trainImage
+
+img1 = cv2.imread('imag/teddy/im2.ppm',0) # queryImage
+img2 = cv2.imread('imag/teddy/im6.ppm',0) # trainImage
 
 # Initiate SIFT detector
 sift = cv2.xfeatures2d.SIFT_create()
