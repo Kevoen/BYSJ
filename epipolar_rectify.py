@@ -18,14 +18,6 @@ import os
 numEdgeX = 7
 numEdgeY = 6
 
-# # preface
-# exitCode = 0
-#
-# # get directories
-# pathDir = str(os.path.dirname(os.path.realpath(__file__)))
-# pathDir = pathDir[:-17]
-# pathCalib = pathDir + "\\CalibData" + "\\chess"
-
 try:
     # define pair
     # p = 1
@@ -236,11 +228,13 @@ try:
             cv2.line(numpyHorizontalUncalibRect, (x1[jj], y1[jj]), (x2[jj], y2[jj]),
                      lineColor, lineThickness)
             cv2.line(img_l,(x1[jj], y1[jj]), (x2[jj], y2[jj]),lineColor, lineThickness)
+            cv2.line(img_r, (x1[jj], y1[jj]), (x2[jj], y2[jj]), lineColor, lineThickness)
+            images = np.hstack((img_l, img_r))
         cv2.namedWindow("calibRect", cv2.WINDOW_NORMAL)
         cv2.namedWindow("uncalibRect", cv2.WINDOW_NORMAL)
         cv2.imshow("calibRect", numpyHorizontalCalibRect)
         cv2.imshow("uncalibRect", numpyHorizontalUncalibRect)
-        # cv2.imshow("left",img_l)
+        cv2.imshow("left-right",images)
         cv2.waitKey()
         cv2.destroyAllWindows()
 
