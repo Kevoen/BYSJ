@@ -198,8 +198,8 @@ def stereo_rect(inter_corner_shape, img_dir, img_type):
 
 
 if __name__ == '__main__':
-    inter_corner_shape = (7, 6)
-    img_dir = "imag/chessboard"
+    inter_corner_shape = (10, 7)
+    img_dir = "imag/mychessborad"
     img_type = "jpg"
     stereo_cal(inter_corner_shape, img_dir, img_type)
     # stereo_rect(inter_corner_shape, img_dir, img_type)
