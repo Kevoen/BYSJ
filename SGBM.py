@@ -95,10 +95,10 @@ for i in range(size1):
 
 print(depth)
 plt.title('disparity and depth')
-plt.subplot(221), plt.imshow(imgL)
-plt.subplot(222), plt.imshow(imgR)
-plt.subplot(223), plt.imshow(disparity)
-plt.subplot(224), plt.imshow(depth)
+# plt.subplot(221), plt.imshow(imgL)
+# plt.subplot(222), plt.imshow(imgR)
+plt.subplot(121), plt.imshow(disparity)
+plt.subplot(122), plt.imshow(depth)
 print('用时:',time.time()-tic1)
 plt.show()
 
