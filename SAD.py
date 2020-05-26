@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from numba import jit
 from PIL import Image
 maxDisparity=25 #最大视差
-window_size=5#滑动窗口大小
+window_size=13#滑动窗口大小
 
 lraw=cv.imread('imag/teddy/im2.ppm')
 rraw=cv.imread('imag/teddy/im6.ppm')
